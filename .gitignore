@@ -1,0 +1,9 @@
+.idea
+.ipynb_checkpoints
+**/data
+**/client/data
+**/__pycache__
+**/X.npy
+**/y.npy
+myproject.egg-info
+venv
