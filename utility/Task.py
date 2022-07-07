@@ -11,3 +11,4 @@ class Task:
         self.filetype = filetype
         self.filename = filename
         self.filesize = filesize
+        self.filepath=None

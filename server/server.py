@@ -6,6 +6,7 @@ import pathlib
 import pickle
 import socket
 
+import numpy as np
 import tqdm
 
 from utility.Task import Task
@@ -75,6 +76,7 @@ def send_input_file(conn, input_type, filename=None):
     print('[x] serialized task sent')
     send_file(file, conn)
     print('[x] file sent', task.filename)
+
     #
 
 
@@ -92,6 +94,26 @@ def main():
         with conn:
             send_input_file(conn, 'X', 'X.npy')
             send_input_file(conn, 'Y', 'y.npy')
+
+            model_length = conn.recv(1024)
+            print('[x] length received')
+            model_length = int.from_bytes(model_length, byteorder='little')
+            model = conn.recv(model_length)
+            print('[x] model received')
+            model = pickle.loads(model)
+
+            file1 = pathlib.Path(__file__).parent.joinpath('X.npy').resolve()
+            file2 = pathlib.Path(__file__).parent.joinpath('y.npy').resolve()
+
+            with open(file1, 'rb') as f:
+                X = np.load(file1, allow_pickle=True)
+            with open(file2, 'rb') as f:
+                y = np.load(file2, allow_pickle=True)
+
+            from sklearn.metrics import accuracy_score
+            y_pred = model.predict(X)
+            print('[x] evaluation finished accuracy:', accuracy_score(y, y_pred))
+            print('[x] shutting down')
 
 
 if __name__ == '__main__':
